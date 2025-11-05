@@ -131,14 +131,6 @@ Create a `.env` file:
 OLLAMA_HOST=http://localhost:11434
 ```
 
-### Customizing Article Limit
-
-In `app/main.py`, change the article limit per feed:
-
-```python
-for entry in parsed_feed.entries[:3]:  # Change 3 to your desired limit
-```
-
 ## 🐳 Docker Configuration
 
 The application uses Docker to ensure consistent deployment across different environments.

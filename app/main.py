@@ -36,7 +36,7 @@ templates = Jinja2Templates(directory="app/templates")
 def summarize_ollama(text: str, url: str):
     """Summarize using local Ollama + Llama 3.2 3B Instruct model via HTTP API."""
     logger.info(f"[Ollama] Summarizing {len(text)} chars from {url}")
-    prompt = f"Summarize the following news article into 5-10 sentences:\n\n{text}\n\nURL: {url}"
+    prompt = f"Summarize the following news article into 5-10 sentences. Provide only the summary without any introductory phrases like 'Here is a summary' or 'Hier is een samenvatting':\n\n{text}\n\nURL: {url}"
 
     # Use host.docker.internal to connect to Ollama running on host machine
     # If running locally without Docker, use localhost

@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2025-11-05
+
+### Added
+- **Configurable articles per feed**: Users can now select 1-10 articles per feed via UI input
+- **Live estimate display**: Shows total articles and estimated processing time before summarization
+- **7 additional NOS feeds**: Algemeen, Binnenland, Economie, Sport, Cultuur & Media, Opmerkelijk, Koningshuis
+- **Enhanced progress bar**: Beautiful cyan/blue gradient with shimmer animation and glow effects
+- **Pulse animation**: Current article being processed has a pulsing glow effect
+- **Mobile access documentation**: Complete guide for accessing the app from phone (MOBIEL_TOEGANG.md)
+- **Improved prompt**: Better instruction to Ollama to avoid introductory phrases in summaries
+
+### Changed
+- Progress bar height increased from 30px to 40px for better visibility
+- Progress bar now features gradient backgrounds and 3D shadow effects
+- Progress container has slide-in animation when appearing
+- Current article display has enhanced styling with gradient background
+- Total RSS feeds increased from 15 to 22 (10 NOS feeds total)
+
+### Fixed
+- Summary responses now have clearer prompts to reduce unwanted prefixes
+
 ## [1.0.0] - 2025-11-05
 
 ### Added
