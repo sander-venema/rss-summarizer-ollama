@@ -42,44 +42,98 @@
     .progress-container {
       display: none;
       margin: 2rem 0;
-      padding: 1.5rem;
-      background: var(--card-background-color);
-      border-radius: var(--border-radius);
+      padding: 2rem;
+      background: linear-gradient(135deg, #0f0f1e 0%, #1a1a2e 100%);
+      border-radius: 16px;
+      border: 2px solid #0f3460;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.4);
     }
     .progress-container.active {
       display: block;
+      animation: slideIn 0.3s ease-out;
+    }
+    .progress-container h2 {
+      color: #00d4ff;
+      margin-bottom: 1.5rem;
+      text-align: center;
+      font-size: 1.5rem;
+    }
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
     .progress-bar {
       width: 100%;
-      height: 30px;
-      background: var(--form-element-background-color);
-      border-radius: var(--border-radius);
+      height: 40px;
+      background: linear-gradient(to right, #1a1a2e, #16213e);
+      border-radius: 12px;
       overflow: hidden;
       margin: 1rem 0;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+      border: 2px solid #0f3460;
+      position: relative;
     }
     .progress-fill {
       height: 100%;
-      background: linear-gradient(90deg, var(--primary), var(--primary-hover));
-      transition: width 0.3s ease;
+      background: linear-gradient(90deg, #00d4ff, #0099ff, #00d4ff);
+      background-size: 200% 100%;
+      animation: shimmer 2s infinite;
+      transition: width 0.5s ease-out;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: white;
+      color: #ffffff;
       font-weight: bold;
+      font-size: 1.1rem;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+      box-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+      position: relative;
+    }
+    .progress-fill::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 50%;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.3), transparent);
+      border-radius: 12px 12px 0 0;
+    }
+    @keyframes shimmer {
+      0% { background-position: 0% 0%; }
+      50% { background-position: 100% 0%; }
+      100% { background-position: 0% 0%; }
     }
     .progress-info {
       display: flex;
       justify-content: space-between;
       margin-top: 0.5rem;
-      font-size: 0.9rem;
-      color: var(--muted-color);
+      font-size: 1rem;
+      font-weight: 500;
+      color: #00d4ff;
     }
     .current-article {
-      margin-top: 1rem;
-      padding: 1rem;
-      background: var(--form-element-background-color);
-      border-radius: var(--border-radius);
-      border-left: 4px solid var(--primary);
+      margin-top: 1.5rem;
+      padding: 1.25rem;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      border-radius: 12px;
+      border-left: 5px solid #00d4ff;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+      animation: pulse 2s infinite;
+    }
+    .current-article strong {
+      color: #00d4ff;
+      font-size: 1.1rem;
+    }
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 4px 6px rgba(0,0,0,0.3), 0 0 0 0 rgba(0, 212, 255, 0.4); }
+      50% { box-shadow: 0 4px 6px rgba(0,0,0,0.3), 0 0 0 10px rgba(0, 212, 255, 0); }
     }
     #summarizeForm.processing {
       opacity: 0.5;
@@ -95,10 +149,25 @@
     <form id="summarizeForm" method="post" action="/summarize">
       <div class="feed-selection">
         <h2>Select News Sources</h2>
-        <p>
-          <button type="button" onclick="selectAll()">Select All</button>
-          <button type="button" onclick="deselectAll()">Deselect All</button>
-        </p>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <div>
+            <button type="button" onclick="selectAll()">Select All</button>
+            <button type="button" onclick="deselectAll()">Deselect All</button>
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <label for="articles_per_feed" style="margin: 0;">Articles per feed:</label>
+            <input
+              type="number"
+              id="articles_per_feed"
+              name="articles_per_feed"
+              value="3"
+              min="1"
+              max="10"
+              style="width: 80px; margin: 0;"
+              title="Number of articles to summarize from each feed (1-10)"
+            >
+          </div>
+        </div>
 
         {% set categories = feeds | map(attribute='category') | unique | list %}
         {% for category in categories %}
@@ -116,7 +185,8 @@
         {% endfor %}
       </div>
 
-      <button type="submit">Summarize Selected Feeds</button>
+      <button type="submit" id="submitBtn">Summarize Selected Feeds</button>
+      <p id="estimateText" style="text-align: center; color: var(--muted-color); margin-top: 0.5rem;"></p>
     </form>
 
     <!-- Progress Container -->
@@ -153,10 +223,35 @@
   <script>
     function selectAll() {
       document.querySelectorAll('input[name="selected_feeds"]').forEach(cb => cb.checked = true);
+      updateEstimate();
     }
     function deselectAll() {
       document.querySelectorAll('input[name="selected_feeds"]').forEach(cb => cb.checked = false);
+      updateEstimate();
     }
+
+    function updateEstimate() {
+      const selectedCount = document.querySelectorAll('input[name="selected_feeds"]:checked').length;
+      const articlesPerFeed = parseInt(document.getElementById('articles_per_feed').value) || 3;
+      const totalArticles = selectedCount * articlesPerFeed;
+      const estimatedTime = Math.ceil(totalArticles * 10 / 60); // ~10 seconds per article
+
+      const estimateText = document.getElementById('estimateText');
+      if (selectedCount > 0) {
+        estimateText.textContent = `Will process approximately ${totalArticles} articles from ${selectedCount} feed(s) (~${estimatedTime} min)`;
+      } else {
+        estimateText.textContent = 'Please select at least one feed';
+      }
+    }
+
+    // Update estimate when checkboxes or number input changes
+    document.addEventListener('DOMContentLoaded', () => {
+      updateEstimate();
+      document.querySelectorAll('input[name="selected_feeds"]').forEach(cb => {
+        cb.addEventListener('change', updateEstimate);
+      });
+      document.getElementById('articles_per_feed').addEventListener('input', updateEstimate);
+    });
 
     // Handle form submission with progress tracking
     document.getElementById('summarizeForm').addEventListener('submit', async (e) => {

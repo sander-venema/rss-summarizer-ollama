@@ -20,6 +20,41 @@
     "category": "Technology"
   },
   {
+    "name": "NOS Nieuws - Algemeen",
+    "url": "https://feeds.nos.nl/nosnieuwsalgemeen",
+    "category": "Netherlands"
+  },
+  {
+    "name": "NOS Nieuws - Binnenland",
+    "url": "https://feeds.nos.nl/nosnieuwsbinnenland",
+    "category": "Netherlands"
+  },
+  {
+    "name": "NOS Nieuws - Economie",
+    "url": "https://feeds.nos.nl/nosnieuwseconomie",
+    "category": "Netherlands"
+  },
+  {
+    "name": "NOS Nieuws - Sport",
+    "url": "https://feeds.nos.nl/nossport",
+    "category": "Netherlands"
+  },
+  {
+    "name": "NOS Nieuws - Cultuur & Media",
+    "url": "https://feeds.nos.nl/noscultuurenmedia",
+    "category": "Netherlands"
+  },
+  {
+    "name": "NOS Nieuws - Opmerkelijk",
+    "url": "https://feeds.nos.nl/nosopmerkelijk",
+    "category": "Netherlands"
+  },
+  {
+    "name": "NOS Nieuws - Koningshuis",
+    "url": "https://feeds.nos.nl/noskoningshuis",
+    "category": "Netherlands"
+  },
+  {
     "name": "Reuters World News",
     "url": "https://www.reutersagency.com/feed/?taxonomy=best-topics&post_type=best",
     "category": "International"

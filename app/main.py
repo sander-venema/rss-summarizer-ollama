@@ -76,18 +76,21 @@ async def index(request: Request):
 
 
 @app.post("/summarize")
-async def run_summarizer(selected_feeds: List[str] = Form(...)):
+async def run_summarizer(selected_feeds: List[str] = Form(...), articles_per_feed: int = Form(3)):
     """Stream progress updates while summarizing articles."""
 
     async def generate_progress():
         articles = []
         selected_feed_list = [f for f in RSS_FEEDS if f['url'] in selected_feeds]
 
+        # Validate articles_per_feed
+        max_articles = max(1, min(articles_per_feed, 10))  # Limit between 1 and 10
+
         # Calculate total articles to process
         total_articles = 0
         for feed in selected_feed_list:
             parsed_feed = feedparser.parse(feed['url'])
-            total_articles += min(len(parsed_feed.entries), 3)
+            total_articles += min(len(parsed_feed.entries), max_articles)
 
         processed = 0
         start_time = time.time()
@@ -96,7 +99,7 @@ async def run_summarizer(selected_feeds: List[str] = Form(...)):
             logger.info(f"Fetching feed: {feed['name']} ({feed['url']})")
             parsed_feed = feedparser.parse(feed['url'])
 
-            for entry in parsed_feed.entries[:3]:
+            for entry in parsed_feed.entries[:max_articles]:
                 url = entry.link
                 title = entry.title
 
