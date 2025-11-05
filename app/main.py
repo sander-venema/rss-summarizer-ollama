@@ -33,10 +33,19 @@ app = FastAPI()
 templates = Jinja2Templates(directory="app/templates")
 
 
-def summarize_ollama(text: str, url: str):
+def summarize_ollama(text: str, url: str, summary_length: str = "medium"):
     """Summarize using local Ollama + Llama 3.2 3B Instruct model via HTTP API."""
-    logger.info(f"[Ollama] Summarizing {len(text)} chars from {url}")
-    prompt = f"Summarize the following news article into 5-10 sentences. Provide only the summary without any introductory phrases like 'Here is a summary' or 'Hier is een samenvatting':\n\n{text}\n\nURL: {url}"
+    logger.info(f"[Ollama] Summarizing {len(text)} chars from {url} with length: {summary_length}")
+
+    # Define summary length instructions
+    length_instructions = {
+        "short": "2-3 sentences",
+        "medium": "5-7 sentences",
+        "long": "10-15 sentences"
+    }
+
+    instruction = length_instructions.get(summary_length, "5-7 sentences")
+    prompt = f"Summarize the following news article into {instruction}. Provide only the summary without any introductory phrases like 'Here is a summary' or 'Hier is een samenvatting':\n\n{text}\n\nURL: {url}"
 
     # Use host.docker.internal to connect to Ollama running on host machine
     # If running locally without Docker, use localhost

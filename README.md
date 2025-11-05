@@ -11,9 +11,14 @@ An intelligent RSS feed aggregator that uses **Ollama** and **Llama 3.2 3B** to 
 ## ✨ Features
 
 - 🤖 **AI-Powered Summaries**: Uses Llama 3.2 3B via Ollama for intelligent article summarization
+- 📏 **Custom Summary Length**: Choose between Short (2-3 sentences), Medium (5-7 sentences), or Long (10-15 sentences)
+- 🎨 **Dark/Light Theme**: Toggle between dark and light modes with persistent preference
+- 🖼️ **News Source Logos**: Visual identification with favicon/logo for each news source
 - 📡 **22 News Sources**: Curated selection of top-tier international news feeds
 - ✅ **Selective Processing**: Choose which news sources to summarize with checkboxes
+- 🔢 **Configurable Articles**: Select 1-10 articles per feed with live estimate
 - 📊 **Real-Time Progress**: Live progress bar with ETA and current article tracking
+- 🎯 **Auto-Scroll**: Automatically scrolls to progress bar when summarization starts
 - 🎨 **Modern UI**: Clean, responsive interface built with Pico CSS
 - 🐳 **Docker Ready**: Fully containerized for easy deployment
 - 🔄 **Streaming Updates**: Server-Sent Events for real-time progress updates
@@ -95,9 +100,13 @@ An intelligent RSS feed aggregator that uses **Ollama** and **Llama 3.2 3B** to 
 ## 🎯 Usage
 
 1. **Select News Sources**: Check/uncheck the news sources you want to summarize
-2. **Click "Summarize Selected Feeds"**: Start the summarization process
-3. **Watch Progress**: Real-time progress bar shows current article and ETA
-4. **Read Summaries**: AI-generated summaries appear as they're processed
+2. **Configure Settings**:
+   - Choose number of articles per feed (1-10)
+   - Select summary length (Short, Medium, or Long)
+3. **Toggle Theme**: Click the 🌙/☀️ button in the top-right to switch between dark/light mode
+4. **Click "Summarize Selected Feeds"**: Start the summarization process
+5. **Watch Progress**: Page auto-scrolls to show real-time progress bar with ETA and current article
+6. **Read Summaries**: AI-generated summaries appear with news source logos for easy identification
 
 ## 🏗️ Architecture
 

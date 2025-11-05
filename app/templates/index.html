@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <title>RSS Summarizer - Ollama</title>
@@ -38,7 +38,17 @@
       color: var(--muted-color);
       font-size: 0.9rem;
       margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
+    .source-logo {
+      width: 20px;
+      height: 20px;
+      object-fit: contain;
+      border-radius: 3px;
+    }
+
     .progress-container {
       display: none;
       margin: 2rem 0;
@@ -142,30 +152,46 @@
   </style>
 </head>
 <body>
+  <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">🌙</button>
   <main class="container">
-    <h1>📰 RSS Summarizer with Ollama</h1>
+    <h1>RSS Summarizer with Ollama</h1>
     <p>Select news sources and get AI-powered summaries using Llama 3.2 3B</p>
 
     <form id="summarizeForm" method="post" action="/summarize">
       <div class="feed-selection">
         <h2>Select News Sources</h2>
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
           <div>
             <button type="button" onclick="selectAll()">Select All</button>
             <button type="button" onclick="deselectAll()">Deselect All</button>
           </div>
-          <div style="display: flex; align-items: center; gap: 0.5rem;">
-            <label for="articles_per_feed" style="margin: 0;">Articles per feed:</label>
-            <input
-              type="number"
-              id="articles_per_feed"
-              name="articles_per_feed"
-              value="3"
-              min="1"
-              max="10"
-              style="width: 80px; margin: 0;"
-              title="Number of articles to summarize from each feed (1-10)"
-            >
+          <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <label for="articles_per_feed" style="margin: 0;">Articles per feed:</label>
+              <input
+                type="number"
+                id="articles_per_feed"
+                name="articles_per_feed"
+                value="3"
+                min="1"
+                max="10"
+                style="width: 80px; margin: 0;"
+                title="Number of articles to summarize from each feed (1-10)"
+              >
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <label for="summary_length" style="margin: 0;">Summary length:</label>
+              <select
+                id="summary_length"
+                name="summary_length"
+                style="width: 200px; margin: 0;"
+                title="Choose the length of the AI-generated summaries"
+              >
+                <option value="short">Short (2-3)</option>
+                <option value="medium" selected>Medium (5-7)</option>
+                <option value="long">Long (10-15)</option>
+              </select>
+            </div>
           </div>
         </div>
 
@@ -208,10 +234,13 @@
     <!-- Results Container -->
     <div id="resultsContainer">
       {% if articles %}
-      <h2>📝 Summaries ({{ articles|length }} articles)</h2>
+      <h2 Summaries ({{ articles|length }} articles)</h2>
       {% for art in articles %}
         <div class="article-card">
-          <div class="article-source">{{ art.source }}</div>
+          <div class="article-source">
+            <img src="" alt="{{ art.source }}" class="source-logo" data-source="{{ art.source }}" onerror="this.style.display='none'">
+            {{ art.source }}
+          </div>
           <h3><a href="{{ art.url }}" target="_blank">{{ art.title }}</a></h3>
           <p>{{ art.summary }}</p>
         </div>
@@ -221,6 +250,53 @@
   </main>
 
   <script>
+    // Logo mapping for news sources
+    function getSourceLogo(sourceName) {
+      const logoMap = {
+        'BBC News': 'https://www.bbc.co.uk/favicon.ico',
+        'NOS Nieuws - Politiek': 'https://nos.nl/favicon.ico',
+        'NOS Nieuws - Buitenland': 'https://nos.nl/favicon.ico',
+        'NOS Nieuws - Tech': 'https://nos.nl/favicon.ico',
+        'NOS Nieuws - Algemeen': 'https://nos.nl/favicon.ico',
+        'NOS Nieuws - Binnenland': 'https://nos.nl/favicon.ico',
+        'NOS Nieuws - Economie': 'https://nos.nl/favicon.ico',
+        'NOS Nieuws - Sport': 'https://nos.nl/favicon.ico',
+        'NOS Nieuws - Cultuur & Media': 'https://nos.nl/favicon.ico',
+        'NOS Nieuws - Opmerkelijk': 'https://nos.nl/favicon.ico',
+        'NOS Nieuws - Koningshuis': 'https://nos.nl/favicon.ico',
+        'Reuters World News': 'https://www.reuters.com/favicon.ico',
+        'The Guardian - World': 'https://www.theguardian.com/favicon.ico',
+        'The New York Times - World': 'https://www.nytimes.com/vi-assets/static-assets/favicon-4bf96cb6a1093748bf5b3c429accb9b4.ico',
+        'Associated Press - Top News': 'https://apnews.com/favicon.ico',
+        'NPR News': 'https://www.npr.org/favicon.ico',
+        'Deutsche Welle - Top Stories': 'https://www.dw.com/favicon.ico',
+        'France 24 - International': 'https://www.france24.com/favicon.ico',
+        'TechCrunch': 'https://techcrunch.com/wp-content/uploads/2015/02/cropped-cropped-favicon-gradient.png',
+        'Ars Technica': 'https://arstechnica.com/favicon.ico',
+        'The Verge': 'https://www.theverge.com/favicon.ico',
+        'Hacker News': 'https://news.ycombinator.com/favicon.ico'
+      };
+
+      return logoMap[sourceName] || `https://www.google.com/s2/favicons?domain=${encodeURIComponent(sourceName)}&sz=64`;
+    }
+
+    // Theme toggle functionality
+    const themeToggle = document.getElementById('themeToggle');
+    const htmlElement = document.documentElement;
+
+    // Load saved theme preference or default to dark
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    htmlElement.setAttribute('data-theme', savedTheme);
+    themeToggle.textContent = savedTheme === 'dark' ? '🌙' : '☀️';
+
+    themeToggle.addEventListener('click', () => {
+      const currentTheme = htmlElement.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      htmlElement.setAttribute('data-theme', newTheme);
+      themeToggle.textContent = newTheme === 'dark' ? '🌙' : '☀️';
+      localStorage.setItem('theme', newTheme);
+    });
+
     function selectAll() {
       document.querySelectorAll('input[name="selected_feeds"]').forEach(cb => cb.checked = true);
       updateEstimate();
@@ -251,6 +327,12 @@
         cb.addEventListener('change', updateEstimate);
       });
       document.getElementById('articles_per_feed').addEventListener('input', updateEstimate);
+
+      // Set logos for server-rendered articles
+      document.querySelectorAll('img[data-source]').forEach(img => {
+        const sourceName = img.getAttribute('data-source');
+        img.src = getSourceLogo(sourceName);
+      });
     });
 
     // Handle form submission with progress tracking
@@ -264,6 +346,14 @@
       document.getElementById('progressContainer').classList.add('active');
       document.getElementById('resultsContainer').innerHTML = '';
       form.classList.add('processing');
+
+      // Scroll to progress container
+      setTimeout(() => {
+        document.getElementById('progressContainer').scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }, 100);
 
       try {
         // Use fetch with streaming
@@ -320,13 +410,17 @@
 
                 // Display results
                 const resultsContainer = document.getElementById('resultsContainer');
-                resultsContainer.innerHTML = `<h2>📝 Summaries (${data.articles.length} articles)</h2>`;
+                resultsContainer.innerHTML = `<h2>Summaries (${data.articles.length} articles)</h2>`;
 
                 data.articles.forEach(article => {
                   const articleCard = document.createElement('div');
                   articleCard.className = 'article-card';
+                  const logoUrl = getSourceLogo(article.source);
                   articleCard.innerHTML = `
-                    <div class="article-source">${article.source}</div>
+                    <div class="article-source">
+                      <img src="${logoUrl}" alt="${article.source}" class="source-logo" onerror="this.style.display='none'">
+                      ${article.source}
+                    </div>
                     <h3><a href="${article.url}" target="_blank">${article.title}</a></h3>
                     <p>${article.summary}</p>
                   `;

@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.1.0] - 2025-11-05
 
 ### Added
+- **Custom summary length option**: Users can now choose between Short (2-3 sentences), Medium (5-7 sentences), or Long (10-15 sentences) summaries
+- **Dark/light theme toggle**: Floating theme toggle button in top-right corner with persistent preference saved to localStorage
+- **News source logos**: Each article now displays the news source's favicon/logo next to the source name for better visual identification
+- **Auto-scroll to progress bar**: Page automatically scrolls to the progress bar when summarization starts for better UX
 - **Configurable articles per feed**: Users can now select 1-10 articles per feed via UI input
 - **Live estimate display**: Shows total articles and estimated processing time before summarization
 - **7 additional NOS feeds**: Algemeen, Binnenland, Economie, Sport, Cultuur & Media, Opmerkelijk, Koningshuis
@@ -17,14 +21,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Improved prompt**: Better instruction to Ollama to avoid introductory phrases in summaries
 
 ### Changed
+- Summary length is now dynamically adjustable via dropdown selector
+- Theme preference persists across browser sessions
 - Progress bar height increased from 30px to 40px for better visibility
 - Progress bar now features gradient backgrounds and 3D shadow effects
 - Progress container has slide-in animation when appearing
 - Current article display has enhanced styling with gradient background
 - Total RSS feeds increased from 15 to 22 (10 NOS feeds total)
+- Removed emoji decorations from headings for cleaner appearance
 
 ### Fixed
 - Summary responses now have clearer prompts to reduce unwanted prefixes
+- Progress bar is now immediately visible when summarization starts (auto-scroll)
 
 ## [1.0.0] - 2025-11-05
 
@@ -73,7 +81,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [ ] Scheduled automatic summarization
 - [ ] Email digest feature
 - [ ] Multi-language support
-- [ ] Custom summary length options
 - [ ] Article filtering by keywords
-- [ ] Dark/light theme toggle
 
