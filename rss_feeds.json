@@ -1,0 +1,78 @@
+[
+  {
+    "name": "BBC News",
+    "url": "https://feeds.bbci.co.uk/news/rss.xml",
+    "category": "International"
+  },
+  {
+    "name": "NOS Nieuws - Politiek",
+    "url": "https://feeds.nos.nl/nosnieuwspolitiek",
+    "category": "Netherlands"
+  },
+  {
+    "name": "NOS Nieuws - Buitenland",
+    "url": "https://feeds.nos.nl/nosnieuwsbuitenland",
+    "category": "Netherlands"
+  },
+  {
+    "name": "NOS Nieuws - Tech",
+    "url": "https://feeds.nos.nl/nosnieuwstech",
+    "category": "Technology"
+  },
+  {
+    "name": "Reuters World News",
+    "url": "https://www.reutersagency.com/feed/?taxonomy=best-topics&post_type=best",
+    "category": "International"
+  },
+  {
+    "name": "The Guardian - World",
+    "url": "https://www.theguardian.com/world/rss",
+    "category": "International"
+  },
+  {
+    "name": "The New York Times - World",
+    "url": "https://rss.nytimes.com/services/xml/rss/nyt/World.xml",
+    "category": "International"
+  },
+  {
+    "name": "Associated Press - Top News",
+    "url": "https://apnews.com/apf-topnews",
+    "category": "International"
+  },
+  {
+    "name": "NPR News",
+    "url": "https://feeds.npr.org/1001/rss.xml",
+    "category": "International"
+  },
+  {
+    "name": "Deutsche Welle - Top Stories",
+    "url": "https://rss.dw.com/xml/rss-en-all",
+    "category": "International"
+  },
+  {
+    "name": "France 24 - International",
+    "url": "https://www.france24.com/en/rss",
+    "category": "International"
+  },
+  {
+    "name": "TechCrunch",
+    "url": "https://techcrunch.com/feed/",
+    "category": "Technology"
+  },
+  {
+    "name": "Ars Technica",
+    "url": "https://feeds.arstechnica.com/arstechnica/index",
+    "category": "Technology"
+  },
+  {
+    "name": "The Verge",
+    "url": "https://www.theverge.com/rss/index.xml",
+    "category": "Technology"
+  },
+  {
+    "name": "Hacker News",
+    "url": "https://news.ycombinator.com/rss",
+    "category": "Technology"
+  }
+]
+

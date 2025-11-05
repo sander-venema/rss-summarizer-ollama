@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+feedparser
+trafilatura
+python-dotenv
+jinja2
+requests
+python-multipart

@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>RSS Summarizer - Ollama</title>
+  <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
+  <style>
+    .feed-selection {
+      margin: 2rem 0;
+      padding: 1rem;
+      background: var(--card-background-color);
+      border-radius: var(--border-radius);
+    }
+    .feed-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .feed-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .category-header {
+      margin-top: 1.5rem;
+      margin-bottom: 0.5rem;
+      font-weight: bold;
+      color: var(--primary);
+    }
+    .article-card {
+      margin-bottom: 2rem;
+      padding: 1rem;
+      background: var(--card-background-color);
+      border-radius: var(--border-radius);
+    }
+    .article-source {
+      color: var(--muted-color);
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+    }
+    .progress-container {
+      display: none;
+      margin: 2rem 0;
+      padding: 1.5rem;
+      background: var(--card-background-color);
+      border-radius: var(--border-radius);
+    }
+    .progress-container.active {
+      display: block;
+    }
+    .progress-bar {
+      width: 100%;
+      height: 30px;
+      background: var(--form-element-background-color);
+      border-radius: var(--border-radius);
+      overflow: hidden;
+      margin: 1rem 0;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--primary-hover));
+      transition: width 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+    }
+    .progress-info {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+      color: var(--muted-color);
+    }
+    .current-article {
+      margin-top: 1rem;
+      padding: 1rem;
+      background: var(--form-element-background-color);
+      border-radius: var(--border-radius);
+      border-left: 4px solid var(--primary);
+    }
+    #summarizeForm.processing {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <h1>📰 RSS Summarizer with Ollama</h1>
+    <p>Select news sources and get AI-powered summaries using Llama 3.2 3B</p>
+
+    <form id="summarizeForm" method="post" action="/summarize">
+      <div class="feed-selection">
+        <h2>Select News Sources</h2>
+        <p>
+          <button type="button" onclick="selectAll()">Select All</button>
+          <button type="button" onclick="deselectAll()">Deselect All</button>
+        </p>
+
+        {% set categories = feeds | map(attribute='category') | unique | list %}
+        {% for category in categories %}
+          <div class="category-header">{{ category }}</div>
+          <div class="feed-grid">
+            {% for feed in feeds %}
+              {% if feed.category == category %}
+                <label class="feed-item">
+                  <input type="checkbox" name="selected_feeds" value="{{ feed.url }}" checked>
+                  {{ feed.name }}
+                </label>
+              {% endif %}
+            {% endfor %}
+          </div>
+        {% endfor %}
+      </div>
+
+      <button type="submit">Summarize Selected Feeds</button>
+    </form>
+
+    <!-- Progress Container -->
+    <div id="progressContainer" class="progress-container">
+      <h2>Processing Articles...</h2>
+      <div class="progress-bar">
+        <div id="progressFill" class="progress-fill" style="width: 0%;">0%</div>
+      </div>
+      <div class="progress-info">
+        <span id="progressText">Starting...</span>
+        <span id="etaText">Calculating ETA...</span>
+      </div>
+      <div id="currentArticle" class="current-article" style="display: none;">
+        <strong>Currently processing:</strong><br>
+        <span id="currentSource"></span> - <span id="currentTitle"></span>
+      </div>
+    </div>
+
+    <!-- Results Container -->
+    <div id="resultsContainer">
+      {% if articles %}
+      <h2>📝 Summaries ({{ articles|length }} articles)</h2>
+      {% for art in articles %}
+        <div class="article-card">
+          <div class="article-source">{{ art.source }}</div>
+          <h3><a href="{{ art.url }}" target="_blank">{{ art.title }}</a></h3>
+          <p>{{ art.summary }}</p>
+        </div>
+      {% endfor %}
+      {% endif %}
+    </div>
+  </main>
+
+  <script>
+    function selectAll() {
+      document.querySelectorAll('input[name="selected_feeds"]').forEach(cb => cb.checked = true);
+    }
+    function deselectAll() {
+      document.querySelectorAll('input[name="selected_feeds"]').forEach(cb => cb.checked = false);
+    }
+
+    // Handle form submission with progress tracking
+    document.getElementById('summarizeForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const form = e.target;
+      const formData = new FormData(form);
+
+      // Show progress container and hide results
+      document.getElementById('progressContainer').classList.add('active');
+      document.getElementById('resultsContainer').innerHTML = '';
+      form.classList.add('processing');
+
+      try {
+        // Use fetch with streaming
+        const response = await fetch('/summarize', {
+          method: 'POST',
+          body: formData
+        });
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n\n');
+          buffer = lines.pop(); // Keep incomplete line in buffer
+
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              const data = JSON.parse(line.substring(6));
+
+              if (data.type === 'progress') {
+                // Update progress bar
+                const progressFill = document.getElementById('progressFill');
+                progressFill.style.width = data.percent + '%';
+                progressFill.textContent = data.percent + '%';
+
+                // Update progress text
+                document.getElementById('progressText').textContent =
+                  `Processing ${data.current} of ${data.total} articles`;
+
+                // Update ETA
+                const minutes = Math.floor(data.eta / 60);
+                const seconds = data.eta % 60;
+                const etaText = data.eta > 0
+                  ? `ETA: ${minutes}m ${seconds}s`
+                  : 'Calculating...';
+                document.getElementById('etaText').textContent = etaText;
+
+                // Update current article
+                const currentArticleDiv = document.getElementById('currentArticle');
+                currentArticleDiv.style.display = 'block';
+                document.getElementById('currentSource').textContent = data.current_source;
+                document.getElementById('currentTitle').textContent = data.current_article;
+
+              } else if (data.type === 'complete') {
+                // Hide progress container
+                document.getElementById('progressContainer').classList.remove('active');
+                form.classList.remove('processing');
+
+                // Display results
+                const resultsContainer = document.getElementById('resultsContainer');
+                resultsContainer.innerHTML = `<h2>📝 Summaries (${data.articles.length} articles)</h2>`;
+
+                data.articles.forEach(article => {
+                  const articleCard = document.createElement('div');
+                  articleCard.className = 'article-card';
+                  articleCard.innerHTML = `
+                    <div class="article-source">${article.source}</div>
+                    <h3><a href="${article.url}" target="_blank">${article.title}</a></h3>
+                    <p>${article.summary}</p>
+                  `;
+                  resultsContainer.appendChild(articleCard);
+                });
+              }
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('progressContainer').classList.remove('active');
+        form.classList.remove('processing');
+        alert('An error occurred while processing. Please try again.');
+      }
+    });
+  </script>
+</body>
+</html>
