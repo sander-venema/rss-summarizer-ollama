@@ -11,7 +11,7 @@ An intelligent RSS feed aggregator that uses **Ollama** and **Llama 3.2 3B** to 
 ## ✨ Features
 
 - 🤖 **AI-Powered Summaries**: Uses Llama 3.2 3B via Ollama for intelligent article summarization
-- 📡 **15+ News Sources**: Curated selection of top-tier international news feeds
+- 📡 **22 News Sources**: Curated selection of top-tier international news feeds
 - ✅ **Selective Processing**: Choose which news sources to summarize with checkboxes
 - 📊 **Real-Time Progress**: Live progress bar with ETA and current article tracking
 - 🎨 **Modern UI**: Clean, responsive interface built with Pico CSS
@@ -25,15 +25,22 @@ An intelligent RSS feed aggregator that uses **Ollama** and **Llama 3.2 3B** to 
 - Reuters World News
 - The Guardian - World
 - The New York Times - World
-- Associated Press
+- Associated Press - Top News
 - NPR News
-- Deutsche Welle
-- France 24
+- Deutsche Welle - Top Stories
+- France 24 - International
 
 ### Netherlands
 - NOS Nieuws - Politiek
 - NOS Nieuws - Buitenland
 - NOS Nieuws - Tech
+- NOS Nieuws - Algemeen
+- NOS Nieuws - Binnenland
+- NOS Nieuws - Economie
+- NOS Nieuws - Sport
+- NOS Nieuws - Cultuur & Media
+- NOS Nieuws - Opmerkelijk
+- NOS Nieuws - Koningshuis
 
 ### Technology
 - TechCrunch

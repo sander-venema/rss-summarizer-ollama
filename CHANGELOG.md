@@ -43,7 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Features
 - **News Sources**:
   - International: BBC, Reuters, Guardian, NYT, AP, NPR, DW, France 24
-  - Netherlands: NOS Nieuws (Politiek, Buitenland, Tech)
+  - Netherlands: NOS Nieuws (Politiek, Buitenland, Tech, Algemeen, Binnenland, Economie, Sport, Cultuur & Media, Opmerkelijk, Koningshuis)
   - Technology: TechCrunch, Ars Technica, The Verge, Hacker News
 - **Progress Tracking**:
   - Real-time progress bar
